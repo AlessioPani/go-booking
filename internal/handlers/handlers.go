@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/AlessioPani/go-booking/internal/config"
+	"github.com/AlessioPani/go-booking/internal/forms"
 	"github.com/AlessioPani/go-booking/internal/models"
 	"github.com/AlessioPani/go-booking/internal/renders"
 	"log"
@@ -55,7 +56,14 @@ func (pr *Repository) About(w http.ResponseWriter, r *http.Request) {
 
 // Reservation renders the make a reservation page and displays form
 func (pr *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
-	renders.RenderTemplate(w, r, "make-reservation.page.tmpl", &models.TemplateData{})
+	renders.RenderTemplate(w, r, "make-reservation.page.tmpl", &models.TemplateData{
+		Form: forms.New(nil),
+	})
+}
+
+// PostReservation handles the posting of a reservation form
+func (pr *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
+
 }
 
 // Generals renders the room page
