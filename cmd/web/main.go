@@ -2,13 +2,12 @@ package main
 
 import (
 	"fmt"
+	"github.com/AlessioPani/go-booking/internal/config"
+	"github.com/AlessioPani/go-booking/internal/handlers"
+	"github.com/AlessioPani/go-booking/internal/renders"
 	"log"
 	"net/http"
 	"time"
-
-	"github.com/AlessioPani/go-booking/pkg/config"
-	"github.com/AlessioPani/go-booking/pkg/handlers"
-	"github.com/AlessioPani/go-booking/pkg/renders"
 
 	"github.com/alexedwards/scs/v2"
 )

@@ -1,13 +1,13 @@
 package renders
 
 import (
+	"github.com/AlessioPani/go-booking/internal/config"
+	"github.com/AlessioPani/go-booking/internal/models"
 	"html/template"
 	"log"
 	"net/http"
 	"path/filepath"
 
-	"github.com/AlessioPani/go-booking/pkg/config"
-	"github.com/AlessioPani/go-booking/pkg/models"
 	"github.com/justinas/nosurf"
 )
 
