@@ -20,6 +20,7 @@ func TestMain(m *testing.M) {
 
 	// change this to true when in production
 	testApp.InProduction = false
+	testApp.UseCache = false
 
 	// set up the session
 	session = scs.New()
@@ -34,4 +35,19 @@ func TestMain(m *testing.M) {
 
 	os.Exit(m.Run())
 
+}
+
+type myWriter struct{}
+
+func (tw *myWriter) Header() http.Header {
+	return http.Header{}
+}
+
+func (tw *myWriter) WriteHeader(i int) {
+
+}
+
+func (tw *myWriter) Write(b []byte) (int, error) {
+	length := len(b)
+	return length, nil
 }

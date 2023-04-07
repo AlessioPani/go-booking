@@ -6,6 +6,10 @@ import (
 	"testing"
 )
 
+func TestNewTemplates(t *testing.T) {
+	NewTemplates(app)
+}
+
 func TestAddDefaultData(t *testing.T) {
 	var td models.TemplateData
 
@@ -19,6 +23,41 @@ func TestAddDefaultData(t *testing.T) {
 
 	if result.Flash != "123" {
 		t.Error("Flash value of 123 not found in session")
+	}
+}
+
+func TestRenderTemplate(t *testing.T) {
+	pathToTemplates = "./../../templates"
+	tc, err := CreateTemplateCache()
+	if err != nil {
+		t.Error(err)
+	}
+
+	app.TemplateCache = tc
+
+	r, err := getSession()
+	if err != nil {
+		t.Error("Failed to get session")
+	}
+
+	w := myWriter{}
+
+	err = RenderTemplate(&w, r, "home.page.tmpl", &models.TemplateData{})
+	if err != nil {
+		t.Error("Error writing a template to browser")
+	}
+
+	err = RenderTemplate(&w, r, "non-existent.page.tmpl", &models.TemplateData{})
+	if err == nil {
+		t.Error("Rendered a template that does not exist")
+	}
+}
+
+func TestCreateTemplateCache(t *testing.T) {
+	pathToTemplates = "./../../templates"
+	_, err := CreateTemplateCache()
+	if err != nil {
+		t.Error(err)
 	}
 }
 
