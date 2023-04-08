@@ -32,7 +32,21 @@ This repository contains a web application for a Booking and Reservation system.
     ```
   
 
+- Various used instructions
 
+  - ```shell
+    soda generate fizz <name_of_migration>
+    ```
+
+  - ```
+    soda migrate
+    ```
+
+  - ```
+    soda migrate down
+    ```
+
+    
 
 ## Database structure
 
