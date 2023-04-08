@@ -91,6 +91,7 @@ Table used to hold the information about restrictions over a room in a given per
 - end_date
 - room_id (foreign key to table Rooms)
 - restriction_id (foreign key to table Restrictions)
+- reservation_id (foreign key to table Reservations)
 - created_at (automatically created by soda)
 - updated_at (automatically created by soda)
 
