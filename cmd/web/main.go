@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"github.com/AlessioPani/go-booking/internal/config"
 	"github.com/AlessioPani/go-booking/internal/handlers"
+	"github.com/AlessioPani/go-booking/internal/helpers"
 	"github.com/AlessioPani/go-booking/internal/models"
 	"github.com/AlessioPani/go-booking/internal/renders"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/alexedwards/scs/v2"
@@ -22,6 +24,9 @@ var app config.AppConfig
 
 // Session
 var session *scs.SessionManager
+
+var infoLog *log.Logger
+var errorLog *log.Logger
 
 // main is the entry point.
 func main() {
@@ -48,6 +53,14 @@ func run() error {
 	// change this to true when in production
 	app.InProduction = false
 
+	// Set up the infoLog
+	infoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	app.InfoLog = infoLog
+
+	// Set up the errorLog
+	errorLog = log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	app.ErrorLog = errorLog
+
 	// set up the session
 	session = scs.New()
 	session.Lifetime = 24 * time.Hour
@@ -67,6 +80,7 @@ func run() error {
 	repo := handlers.NewRepo(&app)
 	handlers.NewHandlers(repo)
 	renders.NewTemplates(&app)
+	helpers.NewHelpers(&app)
 
 	return nil
 }

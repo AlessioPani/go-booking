@@ -17,4 +17,9 @@ This repository contains a web application for a Booking and Reservation system.
     go test -coverprofile=coverage.out && go tool cover -html=coverage.out
     ```
 
+  
+  - ```shell
+    go test -v ./...
+    ```
+  
     
