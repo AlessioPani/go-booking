@@ -4,6 +4,7 @@ import (
 	"encoding/gob"
 	"fmt"
 	"github.com/AlessioPani/go-booking/internal/config"
+	"github.com/AlessioPani/go-booking/internal/driver"
 	"github.com/AlessioPani/go-booking/internal/handlers"
 	"github.com/AlessioPani/go-booking/internal/helpers"
 	"github.com/AlessioPani/go-booking/internal/models"
@@ -31,10 +32,11 @@ var errorLog *log.Logger
 // main is the entry point.
 func main() {
 
-	err := run()
+	db, err := run()
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer db.SQL.Close()
 
 	serve := &http.Server{
 		Addr:    portNumber,
@@ -46,9 +48,12 @@ func main() {
 	log.Fatal(err)
 }
 
-func run() error {
+func run() (*driver.DB, error) {
 	// data models I'm going to put to the session
 	gob.Register(models.Reservation{})
+	gob.Register(models.User{})
+	gob.Register(models.Room{})
+	gob.Register(models.Restriction{})
 
 	// change this to true when in production
 	app.InProduction = false
@@ -71,16 +76,23 @@ func run() error {
 	tc, err := renders.CreateTemplateCache()
 	if err != nil {
 		log.Fatal("cannot create template cache")
-		return err
 	}
 	app.TemplateCache = tc
 	app.UseCache = false
 	app.Session = session
 
-	repo := handlers.NewRepo(&app)
+	// connect to database
+	log.Println("Connecting to database...")
+	db, err := driver.ConnectSQL("host=localhost port=5432 dbname=test_connect user=postgres password=postgres")
+	if err != nil {
+		log.Fatal("cannot connect to database")
+	}
+	log.Println("Connected to database")
+
+	repo := handlers.NewRepo(&app, db)
 	handlers.NewHandlers(repo)
-	renders.NewTemplates(&app)
+	renders.NewRenderer(&app)
 	helpers.NewHelpers(&app)
 
-	return nil
+	return db, nil
 }

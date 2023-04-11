@@ -4,25 +4,30 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/AlessioPani/go-booking/internal/config"
+	"github.com/AlessioPani/go-booking/internal/driver"
 	"github.com/AlessioPani/go-booking/internal/forms"
 	"github.com/AlessioPani/go-booking/internal/helpers"
 	"github.com/AlessioPani/go-booking/internal/models"
 	"github.com/AlessioPani/go-booking/internal/renders"
+	"github.com/AlessioPani/go-booking/internal/repository"
+	"github.com/AlessioPani/go-booking/internal/repository/dbrepo"
 	"net/http"
 )
 
 // Repository is the repository type
 type Repository struct {
 	App *config.AppConfig
+	DB  repository.DatabaseRepo
 }
 
 // Repo is the repository used by handlers
 var Repo *Repository
 
 // NewRepo creates a new repository
-func NewRepo(a *config.AppConfig) *Repository {
+func NewRepo(a *config.AppConfig, db *driver.DB) *Repository {
 	return &Repository{
 		App: a,
+		DB:  dbrepo.NewPostgresRepo(db.SQL, a),
 	}
 }
 
@@ -33,12 +38,12 @@ func NewHandlers(r *Repository) {
 
 // Home is the homepage handler.
 func (pr *Repository) Home(w http.ResponseWriter, r *http.Request) {
-	renders.RenderTemplate(w, r, "home.page.tmpl", &models.TemplateData{})
+	renders.Template(w, r, "home.page.tmpl", &models.TemplateData{})
 }
 
 // About is the about page handler.
 func (pr *Repository) About(w http.ResponseWriter, r *http.Request) {
-	renders.RenderTemplate(w, r, "about.page.tmpl", &models.TemplateData{})
+	renders.Template(w, r, "about.page.tmpl", &models.TemplateData{})
 }
 
 // Reservation renders the make a reservation page and displays form
@@ -47,7 +52,7 @@ func (pr *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
 	data := make(map[string]interface{})
 	data["reservation"] = emptyReservation
 
-	renders.RenderTemplate(w, r, "make-reservation.page.tmpl", &models.TemplateData{
+	renders.Template(w, r, "make-reservation.page.tmpl", &models.TemplateData{
 		Form: forms.New(nil),
 		Data: data,
 	})
@@ -79,7 +84,7 @@ func (pr *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		data := make(map[string]interface{})
 		data["reservation"] = reservation
 
-		renders.RenderTemplate(w, r, "make-reservation.page.tmpl", &models.TemplateData{
+		renders.Template(w, r, "make-reservation.page.tmpl", &models.TemplateData{
 			Form: form,
 			Data: data,
 		})
@@ -92,17 +97,17 @@ func (pr *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 
 // Generals renders the room page
 func (pr *Repository) Generals(w http.ResponseWriter, r *http.Request) {
-	renders.RenderTemplate(w, r, "generals.page.tmpl", &models.TemplateData{})
+	renders.Template(w, r, "generals.page.tmpl", &models.TemplateData{})
 }
 
 // Majors renders the room page
 func (pr *Repository) Majors(w http.ResponseWriter, r *http.Request) {
-	renders.RenderTemplate(w, r, "majors.page.tmpl", &models.TemplateData{})
+	renders.Template(w, r, "majors.page.tmpl", &models.TemplateData{})
 }
 
 // Availability renders the search availability page
 func (pr *Repository) Availability(w http.ResponseWriter, r *http.Request) {
-	renders.RenderTemplate(w, r, "search-availability.page.tmpl", &models.TemplateData{})
+	renders.Template(w, r, "search-availability.page.tmpl", &models.TemplateData{})
 }
 
 // PostAvailability renders the search availability page
@@ -136,7 +141,7 @@ func (pr *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
 
 // Contact renders the contact page
 func (pr *Repository) Contact(w http.ResponseWriter, r *http.Request) {
-	renders.RenderTemplate(w, r, "contact.page.tmpl", &models.TemplateData{})
+	renders.Template(w, r, "contact.page.tmpl", &models.TemplateData{})
 }
 
 // ReservationSummary displays the reservation summary page
@@ -154,7 +159,7 @@ func (pr *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request)
 	data := make(map[string]interface{})
 	data["reservation"] = reservation
 
-	renders.RenderTemplate(w, r, "reservation-summary.page.tmpl", &models.TemplateData{
+	renders.Template(w, r, "reservation-summary.page.tmpl", &models.TemplateData{
 		Data: data,
 	})
 }

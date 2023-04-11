@@ -6,8 +6,8 @@ import (
 	"testing"
 )
 
-func TestNewTemplates(t *testing.T) {
-	NewTemplates(app)
+func TestNewRenderer(t *testing.T) {
+	NewRenderer(app)
 }
 
 func TestAddDefaultData(t *testing.T) {
@@ -42,12 +42,12 @@ func TestRenderTemplate(t *testing.T) {
 
 	w := myWriter{}
 
-	err = RenderTemplate(&w, r, "home.page.tmpl", &models.TemplateData{})
+	err = Template(&w, r, "home.page.tmpl", &models.TemplateData{})
 	if err != nil {
 		t.Error("Error writing a template to browser")
 	}
 
-	err = RenderTemplate(&w, r, "non-existent.page.tmpl", &models.TemplateData{})
+	err = Template(&w, r, "non-existent.page.tmpl", &models.TemplateData{})
 	if err == nil {
 		t.Error("Rendered a template that does not exist")
 	}
