@@ -16,3 +16,6 @@
 .fleet/settings.json
 
 database.yml
+/.idea/inspectionProfiles/Project_Default.xml
+/bookings
+/.idea/sqldialects.xml
