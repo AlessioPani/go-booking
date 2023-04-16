@@ -73,7 +73,7 @@ func (m *postgresDbRepo) SearchAvailabilityByDatesByRoomId(start time.Time, end 
 
 	query := `SELECT count(id)
 			  FROM room_restrictions
-		      WHERE roomId = $1 and $2 < end_date and $3 > start_date;
+		      WHERE room_id = $1 and $2 < end_date and $3 > start_date;
 	`
 	var numRows int
 

@@ -225,16 +225,20 @@
 
             async function custom(c) {
                 const {
+                    icon = "",
                     msg = "",
                     title = "",
+                    showConfirmButton = true,
                 } = c;
 
                 const { value: result } = await Swal.fire({
                     title: title,
                     html: msg,
+                    icon: icon,
                     backdrop: false,
                     focusConfirm: false,
                     showCancelButton: true,
+                    showConfirmButton: showConfirmButton,
 
                     willOpen: () => {
                         if (c.willOpen !== undefined) {
