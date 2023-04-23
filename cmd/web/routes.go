@@ -35,6 +35,8 @@ func routes(a *config.AppConfig) http.Handler {
 	mux.Get("/choose-room/{id}", handlers.Repo.ChooseRoom)
 	mux.Get("/book-room", handlers.Repo.BookRoom)
 
+	mux.Get("/user/login", handlers.Repo.ShowLogin)
+
 	fileServer := http.FileServer(http.Dir("./static/"))
 	mux.Handle("/static/*", http.StripPrefix("/static", fileServer))
 
