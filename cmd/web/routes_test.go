@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/AlessioPani/go-booking/internal/config"
 	"github.com/go-chi/chi/v5"
-	"testing"
 )
 
 func TestRoutes(t *testing.T) {
@@ -16,7 +17,7 @@ func TestRoutes(t *testing.T) {
 	case *chi.Mux:
 	// do nothing
 	default:
-		t.Error(fmt.Sprintf("Type is not *chi.Mux, but %T", v))
+		t.Errorf(fmt.Sprintf("Type is not *chi.Mux, but %T", v))
 	}
 
 }
