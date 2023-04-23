@@ -525,6 +525,63 @@ func TestRepository_ReservationSummary(t *testing.T) {
 	}
 }
 
+func TestRepository_ChooseRoom(t *testing.T) {
+	// first test with no room id parameter in the url
+	req, _ := http.NewRequest("GET", "/choose-room/invalid", nil)
+	ctx := getCtx(req)
+	req = req.WithContext(ctx)
+	req.RequestURI = "/choose-room/invalid"
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(Repo.ChooseRoom)
+
+	handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusTemporaryRedirect {
+		t.Errorf("Choose room with invalid room id gave wrong status code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+	}
+
+	// second test with valid data
+	reservation := models.Reservation{
+		RoomId: 1,
+		Room: models.Room{
+			ID:       1,
+			RoomName: "Test Room",
+		},
+	}
+
+	req, _ = http.NewRequest("GET", "/choose-room/1", nil)
+	ctx = getCtx(req)
+	req = req.WithContext(ctx)
+	req.RequestURI = "/choose-room/1"
+
+	rr = httptest.NewRecorder()
+	session.Put(ctx, "reservation", reservation)
+
+	handler = http.HandlerFunc(Repo.ChooseRoom)
+
+	handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("Choose room with valid data and session gave wrong status code: got %d, wanted %d", rr.Code, http.StatusSeeOther)
+	}
+
+	// third test with valid url but no session
+	req, _ = http.NewRequest("GET", "/choose-room/1", nil)
+	ctx = getCtx(req)
+	req = req.WithContext(ctx)
+	req.RequestURI = "/choose-room/1"
+
+	rr = httptest.NewRecorder()
+
+	handler = http.HandlerFunc(Repo.ChooseRoom)
+
+	handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusTemporaryRedirect {
+		t.Errorf("Choose room with valid data but no session gave wrong status code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+	}
+}
+
 func getCtx(r *http.Request) context.Context {
 	ctx, err := session.Load(r.Context(), r.Header.Get("X-Session"))
 	if err != nil {
