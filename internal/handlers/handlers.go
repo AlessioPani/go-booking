@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/AlessioPani/go-booking/internal/config"
 	"github.com/AlessioPani/go-booking/internal/driver"
 	"github.com/AlessioPani/go-booking/internal/forms"
@@ -103,7 +104,6 @@ func (pr *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 	ed := r.Form.Get("end_date")
 
 	// 2020-01-01 -- 01/02 03:04:05PM '06 -0700
-
 	layout := "2006-01-02"
 
 	startDate, err := time.Parse(layout, sd)
@@ -175,6 +175,48 @@ func (pr *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
+
+	// send mail notification - first to guest
+	htmlMessage := fmt.Sprintf(
+		`<strong>Reservation Confirmation</strong><br><br>
+		Dear %s, <br>
+		this is a confirmation of your reservation from %s to %s .<br><br>
+
+		Looking forward to see you soon<br><br>
+		Best regards,<br>
+		Admin`,
+		reservation.FirstName, reservation.StartDate.Format("2006-01-02"),
+		reservation.EndDate.Format("2006-01-02"))
+
+	msg := models.MailData{
+		To:       reservation.Email,
+		From:     "reservation@me.com",
+		Subject:  "Reservation Confirmation",
+		Content:  htmlMessage,
+		Template: "basic.html",
+	}
+
+	pr.App.MailChan <- msg
+
+	// send mail notification - second to owner
+	htmlMessage = fmt.Sprintf(
+		`<strong>Reservation Notification</strong><br><br>
+		Dear Admin, <br>
+		there is a new reservation from Mr./Mrs. %s %s, from %s to %s. <br><br><br>
+
+		Kind regards,<br>
+		Admin`,
+		reservation.FirstName, reservation.LastName, reservation.StartDate.Format("2006-01-02"),
+		reservation.EndDate.Format("2006-01-02"))
+
+	msgToAdmin := models.MailData{
+		To:      "me@me.com",
+		From:    "me@me.com",
+		Subject: "Reservation Notice",
+		Content: htmlMessage,
+	}
+
+	pr.App.MailChan <- msgToAdmin
 
 	pr.App.Session.Put(r.Context(), "reservation", reservation)
 

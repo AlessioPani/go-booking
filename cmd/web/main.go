@@ -38,6 +38,9 @@ func main() {
 	}
 	defer db.SQL.Close()
 
+	defer close(app.MailChan)
+	listenForMail()
+
 	serve := &http.Server{
 		Addr:    portNumber,
 		Handler: routes(&app),
@@ -54,6 +57,14 @@ func run() (*driver.DB, error) {
 	gob.Register(models.User{})
 	gob.Register(models.Room{})
 	gob.Register(models.Restriction{})
+
+	// create a channel
+	mailChan := make(chan models.MailData)
+	app.MailChan = mailChan
+
+	// starting mail listener
+	log.Println("Starting mail listener...")
+	listenForMail()
 
 	// change this to true when in production
 	app.InProduction = false
