@@ -9,7 +9,6 @@ import (
 	"github.com/AlessioPani/go-booking/internal/renders"
 	"github.com/AlessioPani/go-booking/internal/repository"
 	"github.com/AlessioPani/go-booking/internal/repository/dbrepo"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -214,7 +213,6 @@ func (pr *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
 	startDate, err := time.Parse(layout, start)
 	if err != nil {
 		pr.App.Session.Put(r.Context(), "error", "can't parse start date")
-		log.Println("can't parse start date")
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
@@ -222,7 +220,6 @@ func (pr *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
 	endDate, err := time.Parse(layout, end)
 	if err != nil {
 		pr.App.Session.Put(r.Context(), "error", "can't parse end date")
-		log.Println("can't parse end date")
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
