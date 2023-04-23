@@ -582,6 +582,34 @@ func TestRepository_ChooseRoom(t *testing.T) {
 	}
 }
 
+func TestRepository_BookRoom(t *testing.T) {
+	// first test with valid data
+	req, _ := http.NewRequest("GET", "/book-room/?s=2039-01-01&e=2030-01-02&id=1", nil)
+	ctx := getCtx(req)
+	req = req.WithContext(ctx)
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(Repo.BookRoom)
+
+	handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("Book room with valid data gave wrong status code: got %d, wanted %d", rr.Code, http.StatusSeeOther)
+	}
+
+	// second test with invalid data
+	req, _ = http.NewRequest("GET", "/book-room/?s=2039-01-01&e=2030-01-02&id=10", nil)
+	ctx = getCtx(req)
+	req = req.WithContext(ctx)
+	rr = httptest.NewRecorder()
+	handler = http.HandlerFunc(Repo.BookRoom)
+
+	handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusTemporaryRedirect {
+		t.Errorf("Book room with invalid data gave wrong status code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+	}
+}
+
 func getCtx(r *http.Request) context.Context {
 	ctx, err := session.Load(r.Context(), r.Header.Get("X-Session"))
 	if err != nil {
