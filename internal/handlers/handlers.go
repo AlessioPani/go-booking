@@ -3,6 +3,11 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/AlessioPani/go-booking/internal/config"
 	"github.com/AlessioPani/go-booking/internal/driver"
 	"github.com/AlessioPani/go-booking/internal/forms"
@@ -10,10 +15,6 @@ import (
 	"github.com/AlessioPani/go-booking/internal/renders"
 	"github.com/AlessioPani/go-booking/internal/repository"
 	"github.com/AlessioPani/go-booking/internal/repository/dbrepo"
-	"net/http"
-	"strconv"
-	"strings"
-	"time"
 )
 
 // Repository is the repository type
@@ -446,6 +447,12 @@ func (pr *Repository) BookRoom(w http.ResponseWriter, r *http.Request) {
 }
 
 func (pr *Repository) ShowLogin(w http.ResponseWriter, r *http.Request) {
+	renders.Template(w, r, "login.page.tmpl", &models.TemplateData{
+		Form: forms.New(nil),
+	})
+}
+
+func (pr *Repository) PostShowLogin(w http.ResponseWriter, r *http.Request) {
 	renders.Template(w, r, "login.page.tmpl", &models.TemplateData{
 		Form: forms.New(nil),
 	})
