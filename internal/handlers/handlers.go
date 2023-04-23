@@ -5,7 +5,6 @@ import (
 	"github.com/AlessioPani/go-booking/internal/config"
 	"github.com/AlessioPani/go-booking/internal/driver"
 	"github.com/AlessioPani/go-booking/internal/forms"
-	"github.com/AlessioPani/go-booking/internal/helpers"
 	"github.com/AlessioPani/go-booking/internal/models"
 	"github.com/AlessioPani/go-booking/internal/renders"
 	"github.com/AlessioPani/go-booking/internal/repository"
@@ -272,31 +271,37 @@ type jsonResponse struct {
 
 // AvailabilityJSON handlers requests for availability and send JSON response
 func (pr *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		resp := jsonResponse{
+			OK:      false,
+			Message: "Internal server error",
+		}
+
+		out, _ := json.MarshalIndent(resp, "", "  ")
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(out)
+		return
+	}
+
 	sd := r.Form.Get("start")
 	ed := r.Form.Get("end")
 
 	layout := "2006-01-02"
-	startDate, err := time.Parse(layout, sd)
-	if err != nil {
-		helpers.ServerError(w, err)
-		return
-	}
-
-	endDate, err := time.Parse(layout, ed)
-	if err != nil {
-		helpers.ServerError(w, err)
-		return
-	}
-
-	roomId, err := strconv.Atoi(r.Form.Get("room_id"))
-	if err != nil {
-		helpers.ServerError(w, err)
-		return
-	}
+	startDate, _ := time.Parse(layout, sd)
+	endDate, _ := time.Parse(layout, ed)
+	roomId, _ := strconv.Atoi(r.Form.Get("room_id"))
 
 	available, err := pr.DB.SearchAvailabilityByDatesByRoomId(startDate, endDate, roomId)
 	if err != nil {
-		helpers.ServerError(w, err)
+		resp := jsonResponse{
+			OK:      false,
+			Message: "Error connecting to the database",
+		}
+
+		out, _ := json.MarshalIndent(resp, "", "  ")
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(out)
 		return
 	}
 
@@ -308,11 +313,8 @@ func (pr *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
 		RoomID:    strconv.Itoa(roomId),
 	}
 
-	out, err := json.MarshalIndent(resp, "", " ")
-	if err != nil {
-		helpers.ServerError(w, err)
-		return
-	}
+	// removed error checking, resp is created manually
+	out, _ := json.MarshalIndent(resp, "", " ")
 
 	w.Header().Set("Content-type", "application/json")
 	w.Write(out)

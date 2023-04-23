@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/AlessioPani/go-booking/internal/models"
 	"log"
@@ -607,6 +608,81 @@ func TestRepository_BookRoom(t *testing.T) {
 
 	if rr.Code != http.StatusTemporaryRedirect {
 		t.Errorf("Book room with invalid data gave wrong status code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+	}
+}
+
+func TestRepository_AvailabilityJSON(t *testing.T) {
+	// first case - room not available
+	reqBody := "start=2050-01-01"
+	reqBody = fmt.Sprintf("%s&%s", reqBody, "end=2050-01-02")
+	reqBody = fmt.Sprintf("%s&%s", reqBody, "room_id=1")
+
+	req, _ := http.NewRequest("POST", "/search-availability-json", strings.NewReader(reqBody))
+	ctx := getCtx(req)
+	req = req.WithContext(ctx)
+
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	rr := httptest.NewRecorder()
+
+	handler := http.HandlerFunc(Repo.AvailabilityJSON)
+	handler.ServeHTTP(rr, req)
+
+	var jr jsonResponse
+
+	err := json.Unmarshal([]byte(rr.Body.String()), &jr)
+	if err != nil {
+		t.Error("failed to parse json")
+	}
+
+	if jr.OK {
+		t.Error("AvailabilityJSON with unavailable room responded available")
+	}
+
+	// second case - database error connection
+	reqBody = "start=2060-01-01"
+	reqBody = fmt.Sprintf("%s&%s", reqBody, "end=2060-01-02")
+	reqBody = fmt.Sprintf("%s&%s", reqBody, "room_id=1")
+
+	req, _ = http.NewRequest("POST", "/search-availability-json", strings.NewReader(reqBody))
+	ctx = getCtx(req)
+	req = req.WithContext(ctx)
+
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	rr = httptest.NewRecorder()
+
+	handler = http.HandlerFunc(Repo.AvailabilityJSON)
+	handler.ServeHTTP(rr, req)
+
+	err = json.Unmarshal([]byte(rr.Body.String()), &jr)
+	if err != nil {
+		t.Error("failed to parse json")
+	}
+
+	if jr.OK && jr.Message != "Error connecting to the database" {
+		t.Error("AvailabilityJSON with database error responded available")
+	}
+
+	// third case - failed to parse form
+	req, _ = http.NewRequest("POST", "/search-availability-json", nil)
+	ctx = getCtx(req)
+	req = req.WithContext(ctx)
+
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	rr = httptest.NewRecorder()
+
+	handler = http.HandlerFunc(Repo.AvailabilityJSON)
+	handler.ServeHTTP(rr, req)
+
+	err = json.Unmarshal([]byte(rr.Body.String()), &jr)
+	if err != nil {
+		t.Error("failed to parse json")
+	}
+
+	if jr.OK && jr.Message != "Internal server error" {
+		t.Error("AvailabilityJSON with form parsing error responded available")
 	}
 }
 
