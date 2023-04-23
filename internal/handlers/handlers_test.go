@@ -486,6 +486,45 @@ func TestRepository_PostAvailability(t *testing.T) {
 	}
 }
 
+func TestRepository_ReservationSummary(t *testing.T) {
+	// First case - request with session
+	reservation := models.Reservation{
+		RoomId: 1,
+		Room: models.Room{
+			ID:       1,
+			RoomName: "Test Room",
+		},
+	}
+
+	req, _ := http.NewRequest("POST", "/reservation-summary", nil)
+	ctx := getCtx(req)
+	session.Put(ctx, "reservation", reservation)
+	req = req.WithContext(ctx)
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(Repo.ReservationSummary)
+
+	handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Errorf("Reservation summary with no session gave wrong status code: got %d, wanted %d", rr.Code, http.StatusOK)
+	}
+
+	// Second case - request with no session
+	req, _ = http.NewRequest("POST", "/reservation-summary", nil)
+	ctx = getCtx(req)
+	req = req.WithContext(ctx)
+
+	rr = httptest.NewRecorder()
+	handler = http.HandlerFunc(Repo.ReservationSummary)
+
+	handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusTemporaryRedirect {
+		t.Errorf("Reservation summary with no session gave wrong status code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+	}
+}
+
 func getCtx(r *http.Request) context.Context {
 	ctx, err := session.Load(r.Context(), r.Header.Get("X-Session"))
 	if err != nil {
