@@ -5,7 +5,9 @@
         <div class="row">
             <div class="col">
                 <h1>Login</h1>
-                <form>
+                <form class="" method="post" action="/user/login" novalidate>
+                    <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}">
+
                     <div class="form-group mt-3">
                         <label for="email">Email:</label>
                         {{ with .Form.Errors.Get "email" }}

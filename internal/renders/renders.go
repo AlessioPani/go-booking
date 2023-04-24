@@ -3,12 +3,13 @@ package renders
 import (
 	"errors"
 	"fmt"
-	"github.com/AlessioPani/go-booking/internal/config"
-	"github.com/AlessioPani/go-booking/internal/models"
 	"html/template"
 	"log"
 	"net/http"
 	"path/filepath"
+
+	"github.com/AlessioPani/go-booking/internal/config"
+	"github.com/AlessioPani/go-booking/internal/models"
 
 	"github.com/justinas/nosurf"
 )
@@ -28,6 +29,7 @@ func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateDa
 	td.Error = app.Session.PopString(r.Context(), "error")
 	td.Warning = app.Session.PopString(r.Context(), "warning")
 	td.CSRFToken = nosurf.Token(r)
+	td.IsAuthenticated = app.Session.Exists(r.Context(), "user_id")
 	return td
 }
 
