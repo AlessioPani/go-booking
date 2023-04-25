@@ -500,12 +500,19 @@ func (pr *Repository) AdminDashboard(w http.ResponseWriter, r *http.Request) {
 	renders.Template(w, r, "admin-dashboard.page.tmpl", &models.TemplateData{})
 }
 
-// AdminNewReservations shows an admin page - required authentication
+// AdminNewReservations shows an admin page with all new reservations
 func (pr *Repository) AdminNewReservations(w http.ResponseWriter, r *http.Request) {
-	renders.Template(w, r, "admin-reservations-new.page.tmpl", &models.TemplateData{})
+	reservations, err := pr.DB.AllNewReservations()
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+	data := make(map[string]interface{})
+	data["reservations"] = reservations
+	renders.Template(w, r, "admin-reservations-new.page.tmpl", &models.TemplateData{Data: data})
 }
 
-// AdminAllReservations shows an admin page - required authentication
+// AdminAllReservations shows an admin page with all reservations
 func (pr *Repository) AdminAllReservations(w http.ResponseWriter, r *http.Request) {
 	reservations, err := pr.DB.AllReservations()
 	if err != nil {
