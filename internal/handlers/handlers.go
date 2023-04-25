@@ -12,6 +12,7 @@ import (
 	"github.com/AlessioPani/go-booking/internal/config"
 	"github.com/AlessioPani/go-booking/internal/driver"
 	"github.com/AlessioPani/go-booking/internal/forms"
+	"github.com/AlessioPani/go-booking/internal/helpers"
 	"github.com/AlessioPani/go-booking/internal/models"
 	"github.com/AlessioPani/go-booking/internal/renders"
 	"github.com/AlessioPani/go-booking/internal/repository"
@@ -506,7 +507,14 @@ func (pr *Repository) AdminNewReservations(w http.ResponseWriter, r *http.Reques
 
 // AdminAllReservations shows an admin page - required authentication
 func (pr *Repository) AdminAllReservations(w http.ResponseWriter, r *http.Request) {
-	renders.Template(w, r, "admin-reservations-all.page.tmpl", &models.TemplateData{})
+	reservations, err := pr.DB.AllReservations()
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+	data := make(map[string]interface{})
+	data["reservations"] = reservations
+	renders.Template(w, r, "admin-reservations-all.page.tmpl", &models.TemplateData{Data: data})
 }
 
 // AdminCalendarReservations shows an admin page - required authentication

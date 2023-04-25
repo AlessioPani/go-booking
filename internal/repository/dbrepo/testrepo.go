@@ -117,3 +117,10 @@ func (m *testDbRepo) UpdateUserById(u models.User) error {
 func (m *testDbRepo) Authenticate(email, testPassword string) (int, string, error) {
 	return 1, "", nil
 }
+
+// AllReservations returns a slice of all reservations
+func (m *testDbRepo) AllReservations() ([]models.Reservation, error) {
+	var reservations []models.Reservation
+
+	return reservations, nil
+}

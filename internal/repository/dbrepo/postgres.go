@@ -216,3 +216,55 @@ func (m *postgresDbRepo) Authenticate(email, testPassword string) (int, string, 
 	return id, hashedPassword, nil
 
 }
+
+// AllReservations returns a slice of all reservations
+func (m *postgresDbRepo) AllReservations() ([]models.Reservation, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var reservations []models.Reservation
+
+	query := `SELECT r.id, r.first_name, r.last_name, r.email, r.phone, r.start_date, r.end_date, r.room_id,
+	                 r.created_at, r.updated_at, rm.id, rm.room_name
+			  FROM reservations r
+			  LEFT JOIN rooms rm on (r.room_id = rm.id)
+			  ORDER BY r.start_date asc
+			`
+
+	row, err := m.DB.QueryContext(ctx, query)
+	if err != nil {
+		return reservations, err
+	}
+	defer row.Close()
+
+	for row.Next() {
+		var item models.Reservation
+		err := row.Scan(
+			&item.ID,
+			&item.FirstName,
+			&item.LastName,
+			&item.Email,
+			&item.Phone,
+			&item.StartDate,
+			&item.EndDate,
+			&item.RoomId,
+			&item.CreatedAt,
+			&item.UpdatedAt,
+			&item.Room.ID,
+			&item.Room.RoomName,
+		)
+
+		if err != nil {
+			return reservations, err
+		}
+
+		reservations = append(reservations, item)
+
+		if err := row.Err(); err != nil {
+			return reservations, err
+		}
+	}
+
+	return reservations, nil
+
+}
