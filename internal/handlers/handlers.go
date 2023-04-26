@@ -524,7 +524,37 @@ func (pr *Repository) AdminAllReservations(w http.ResponseWriter, r *http.Reques
 	renders.Template(w, r, "admin-reservations-all.page.tmpl", &models.TemplateData{Data: data})
 }
 
-// AdminCalendarReservations shows an admin page - required authentication
+// AdminCalendarReservations displays a reservations calendar
 func (pr *Repository) AdminCalendarReservations(w http.ResponseWriter, r *http.Request) {
 	renders.Template(w, r, "admin-reservation-calendar.page.tmpl", &models.TemplateData{})
+}
+
+// AdminShowReservation displays in a detailed view a single reservation
+func (pr *Repository) AdminShowReservation(w http.ResponseWriter, r *http.Request) {
+	exploded := strings.Split(r.RequestURI, "/")
+	roomID, err := strconv.Atoi(exploded[4])
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	src := exploded[3]
+	stringMap := make(map[string]string)
+	stringMap["src"] = src
+
+	// get reservation from database
+	res, err := pr.DB.GetReservationById(roomID)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	data := make(map[string]interface{})
+	data["reservation"] = res
+
+	renders.Template(w, r, "admin-reservation-show.page.tmpl", &models.TemplateData{
+		StringMap: stringMap,
+		Data:      data,
+		Form:      forms.New(nil),
+	})
 }

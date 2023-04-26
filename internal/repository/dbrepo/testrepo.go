@@ -131,3 +131,10 @@ func (m *testDbRepo) AllNewReservations() ([]models.Reservation, error) {
 
 	return reservations, nil
 }
+
+// GetReservationById retrieve from the database a reservation by its id
+func (m *testDbRepo) GetReservationById(id int) (models.Reservation, error) {
+	var reservations models.Reservation
+
+	return reservations, nil
+}
