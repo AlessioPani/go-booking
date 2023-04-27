@@ -17,6 +17,7 @@ import (
 	"github.com/AlessioPani/go-booking/internal/renders"
 	"github.com/AlessioPani/go-booking/internal/repository"
 	"github.com/AlessioPani/go-booking/internal/repository/dbrepo"
+	"github.com/go-chi/chi/v5"
 )
 
 // Repository is the repository type
@@ -596,4 +597,17 @@ func (pr *Repository) AdminPostShowReservation(w http.ResponseWriter, r *http.Re
 
 	pr.App.Session.Put(r.Context(), "flash", "Changes saved")
 	http.Redirect(w, r, fmt.Sprintf("/admin/reservations-%s", src), http.StatusSeeOther)
+}
+
+// AdminProcessReservation marks a reservation as processed
+func (pr *Repository) AdminProcessReservation(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
+	src := chi.URLParam(r, "src")
+
+	_ = pr.DB.UpdatedProcessedForReservation(id, 1)
+
+	pr.App.Session.Put(r.Context(), "flash", "Reservation marked as processed")
+
+	http.Redirect(w, r, fmt.Sprintf("/admin/reservations-%s", src), http.StatusSeeOther)
+
 }
