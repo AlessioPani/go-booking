@@ -7,7 +7,7 @@ type TemplateData struct {
 	StringMap       map[string]string
 	IntMap          map[string]int
 	FloatMap        map[string]float32
-	Data            map[string]interface{} // Any data => void interface interface{}
+	Data            map[string]any // Any data => void interface interface{}
 	CSRFToken       string
 	Flash           string
 	Warning         string

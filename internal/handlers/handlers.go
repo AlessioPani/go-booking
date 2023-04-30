@@ -85,7 +85,7 @@ func (pr *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
 	stringMap["start_date"] = sd
 	stringMap["end_date"] = ed
 
-	data := make(map[string]interface{})
+	data := make(map[string]any)
 	data["reservation"] = res
 
 	renders.Template(w, r, "make-reservation.page.tmpl", &models.TemplateData{
@@ -148,7 +148,7 @@ func (pr *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 	form.IsEmail("email")
 
 	if !form.Valid() {
-		data := make(map[string]interface{})
+		data := make(map[string]any)
 		data["reservation"] = reservation
 		http.Error(w, "my own error message", http.StatusSeeOther)
 		renders.Template(w, r, "make-reservation.page.tmpl", &models.TemplateData{
@@ -288,7 +288,7 @@ func (pr *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := make(map[string]interface{})
+	data := make(map[string]any)
 	data["rooms"] = rooms
 
 	res := models.Reservation{
@@ -379,7 +379,7 @@ func (pr *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request)
 
 	pr.App.Session.Remove(r.Context(), "reservation")
 
-	data := make(map[string]interface{})
+	data := make(map[string]any)
 	data["reservation"] = reservation
 
 	sd := reservation.StartDate.Format("2006-01-02")
@@ -508,7 +508,7 @@ func (pr *Repository) AdminNewReservations(w http.ResponseWriter, r *http.Reques
 		helpers.ServerError(w, err)
 		return
 	}
-	data := make(map[string]interface{})
+	data := make(map[string]any)
 	data["reservations"] = reservations
 	renders.Template(w, r, "admin-reservations-new.page.tmpl", &models.TemplateData{Data: data})
 }
@@ -520,14 +520,61 @@ func (pr *Repository) AdminAllReservations(w http.ResponseWriter, r *http.Reques
 		helpers.ServerError(w, err)
 		return
 	}
-	data := make(map[string]interface{})
+	data := make(map[string]any)
 	data["reservations"] = reservations
 	renders.Template(w, r, "admin-reservations-all.page.tmpl", &models.TemplateData{Data: data})
 }
 
 // AdminCalendarReservations displays a reservations calendar
 func (pr *Repository) AdminCalendarReservations(w http.ResponseWriter, r *http.Request) {
-	renders.Template(w, r, "admin-reservation-calendar.page.tmpl", &models.TemplateData{})
+	// assume that there is no month or year specified
+	now := time.Now()
+
+	if r.URL.Query().Get("y") != "" {
+		year, _ := strconv.Atoi(r.URL.Query().Get("y"))
+		month, _ := strconv.Atoi(r.URL.Query().Get("m"))
+		now = time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
+	}
+
+	data := make(map[string]any)
+	data["now"] = now
+
+	next := now.AddDate(0, 1, 0)
+	last := now.AddDate(0, -1, 0)
+
+	nextMonth := next.Format("01")
+	nextMonthYear := next.Format("2006")
+	lastMonth := last.Format("01")
+	lastMonthYear := last.Format("2006")
+
+	stringMap := make(map[string]string)
+	stringMap["next_month"] = nextMonth
+	stringMap["next_month_year"] = nextMonthYear
+	stringMap["last_month"] = lastMonth
+	stringMap["last_month_year"] = lastMonthYear
+
+	// get first and last date of a month
+	currentYear, currentMonth, _ := now.Date()
+	currentLocation := now.Location()
+	firstOfMonth := time.Date(currentYear, currentMonth, 1, 0, 0, 0, 0, currentLocation)
+	lastofMonth := firstOfMonth.AddDate(0, 1, -1)
+
+	intMap := make(map[string]int)
+	intMap["days_in_month"] = lastofMonth.Day()
+
+	rooms, err := pr.DB.AllRooms()
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	data["rooms"] = rooms
+
+	renders.Template(w, r, "admin-reservation-calendar.page.tmpl", &models.TemplateData{
+		StringMap: stringMap,
+		Data:      data,
+		IntMap:    intMap,
+	})
 }
 
 // AdminShowReservation displays in a detailed view a single reservation
@@ -550,7 +597,7 @@ func (pr *Repository) AdminShowReservation(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	data := make(map[string]interface{})
+	data := make(map[string]any)
 	data["reservation"] = res
 
 	renders.Template(w, r, "admin-reservation-show.page.tmpl", &models.TemplateData{

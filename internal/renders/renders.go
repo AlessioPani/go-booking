@@ -16,7 +16,9 @@ import (
 )
 
 var functions = template.FuncMap{
-	"humanDate": HumanDate,
+	"humanDate":  HumanDate,
+	"formatDate": FormatDate,
+	"iterate":    Iterate,
 }
 var app *config.AppConfig
 var pathToTemplates = "./templates"
@@ -29,6 +31,23 @@ func NewRenderer(a *config.AppConfig) {
 // HumanDate converts a time.Time into a string with a YYYY-MM-DD format
 func HumanDate(t time.Time) string {
 	return t.Format("2006-01-02")
+}
+
+// FormatDate converts a time.Time into a string with a f format string
+func FormatDate(t time.Time, f string) string {
+	return t.Format(f)
+}
+
+// Iterate returns a slice of ints, starting at 1 and going to count
+func Iterate(count int) []int {
+	var i int
+	var items []int
+
+	for i = 1; i <= count; i++ {
+		items = append(items, i)
+	}
+
+	return items
 }
 
 // AddDefaultData adds default data to templates
