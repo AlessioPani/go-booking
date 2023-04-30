@@ -131,6 +131,10 @@ func (pr *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	stringMap := make(map[string]string)
+	stringMap["start_date"] = sd
+	stringMap["end_date"] = ed
+
 	res, ok := pr.App.Session.Get(r.Context(), "reservation").(models.Reservation)
 	if !ok {
 		pr.App.Session.Put(r.Context(), "error", "Can't get reservation from session")
@@ -158,10 +162,10 @@ func (pr *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 	if !form.Valid() {
 		data := make(map[string]any)
 		data["reservation"] = reservation
-		http.Error(w, "my own error message", http.StatusSeeOther)
 		renders.Template(w, r, "make-reservation.page.tmpl", &models.TemplateData{
-			Form: form,
-			Data: data,
+			Form:      form,
+			Data:      data,
+			StringMap: stringMap,
 		})
 		return
 	}
