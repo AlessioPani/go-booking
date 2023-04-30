@@ -289,10 +289,6 @@ func (pr *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for _, i := range rooms {
-		pr.App.InfoLog.Println("Room: ", i.ID, i.RoomName)
-	}
-
 	if len(rooms) == 0 {
 		// no availability
 		pr.App.Session.Put(r.Context(), "error", "No availability")
