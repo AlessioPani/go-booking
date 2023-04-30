@@ -544,6 +544,7 @@ func (pr *Repository) AdminCalendarReservations(w http.ResponseWriter, r *http.R
 
 	nextMonth := next.Format("01")
 	nextMonthYear := next.Format("2006")
+
 	lastMonth := last.Format("01")
 	lastMonthYear := last.Format("2006")
 
@@ -552,6 +553,9 @@ func (pr *Repository) AdminCalendarReservations(w http.ResponseWriter, r *http.R
 	stringMap["next_month_year"] = nextMonthYear
 	stringMap["last_month"] = lastMonth
 	stringMap["last_month_year"] = lastMonthYear
+
+	stringMap["this_month"] = now.Format("01")
+	stringMap["this_month_year"] = now.Format("2006")
 
 	// get first and last date of a month
 	currentYear, currentMonth, _ := now.Date()
@@ -569,6 +573,43 @@ func (pr *Repository) AdminCalendarReservations(w http.ResponseWriter, r *http.R
 	}
 
 	data["rooms"] = rooms
+
+	for _, x := range rooms {
+		// create maps
+		reservationMap := make(map[string]int)
+		blockMap := make(map[string]int)
+
+		for d := firstOfMonth; d.After(lastofMonth) == false; d = d.AddDate(0, 0, 1) {
+			reservationMap[d.Format("2006-01-02")] = 0
+			blockMap[d.Format("2006-01-02")] = 0
+		}
+
+		// get all restriction for the current room
+		restrictions, err := pr.DB.GetRestrictionsForRoomByDate(x.ID, firstOfMonth, lastofMonth)
+		if err != nil {
+			helpers.ServerError(w, err)
+			return
+		}
+
+		for _, y := range restrictions {
+			if y.ReservationId > 0 {
+				// it's a reservation
+				for d := y.StartDate; !d.After(y.EndDate); d = d.AddDate(0, 0, 1) {
+					reservationMap[d.Format("2006-01-02")] = y.ReservationId
+				}
+			} else {
+				// it's a block
+				for d := y.StartDate; !d.After(y.EndDate); d = d.AddDate(0, 0, 1) {
+					blockMap[d.Format("2006-01-02")] = y.ID
+				}
+			}
+		}
+
+		data[fmt.Sprintf("reservation_map_%d", x.ID)] = reservationMap
+		data[fmt.Sprintf("block_map_%d", x.ID)] = blockMap
+
+		pr.App.Session.Put(r.Context(), fmt.Sprintf("block_map_%d", x.ID), blockMap)
+	}
 
 	renders.Template(w, r, "admin-reservation-calendar.page.tmpl", &models.TemplateData{
 		StringMap: stringMap,

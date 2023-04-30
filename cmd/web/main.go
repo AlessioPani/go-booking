@@ -3,16 +3,17 @@ package main
 import (
 	"encoding/gob"
 	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"time"
+
 	"github.com/AlessioPani/go-booking/internal/config"
 	"github.com/AlessioPani/go-booking/internal/driver"
 	"github.com/AlessioPani/go-booking/internal/handlers"
 	"github.com/AlessioPani/go-booking/internal/helpers"
 	"github.com/AlessioPani/go-booking/internal/models"
 	"github.com/AlessioPani/go-booking/internal/renders"
-	"log"
-	"net/http"
-	"os"
-	"time"
 
 	"github.com/alexedwards/scs/v2"
 )
@@ -57,6 +58,7 @@ func run() (*driver.DB, error) {
 	gob.Register(models.User{})
 	gob.Register(models.Room{})
 	gob.Register(models.Restriction{})
+	gob.Register(map[string]int{})
 
 	// create a channel
 	mailChan := make(chan models.MailData)

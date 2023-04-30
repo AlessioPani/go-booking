@@ -50,7 +50,7 @@ type Reservation struct {
 
 // RoomRestriction is the Room Restriction model
 type RoomRestriction struct {
-	ID            string
+	ID            int
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
 	StartDate     time.Time
