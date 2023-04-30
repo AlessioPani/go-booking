@@ -131,6 +131,13 @@ func (pr *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	res, ok := pr.App.Session.Get(r.Context(), "reservation").(models.Reservation)
+	if !ok {
+		pr.App.Session.Put(r.Context(), "error", "Can't get reservation from session")
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return
+	}
+
 	reservation := models.Reservation{
 		FirstName: r.Form.Get("first_name"),
 		LastName:  r.Form.Get("last_name"),
@@ -139,6 +146,7 @@ func (pr *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		StartDate: startDate,
 		EndDate:   endDate,
 		RoomId:    roomID,
+		Room:      res.Room,
 	}
 
 	form := forms.New(r.PostForm)
