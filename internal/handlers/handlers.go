@@ -618,6 +618,11 @@ func (pr *Repository) AdminCalendarReservations(w http.ResponseWriter, r *http.R
 	})
 }
 
+// AdminPostCalendarReservations handles post of reservation calendar
+func (pr *Repository) AdminPostCalendarReservations(w http.ResponseWriter, r *http.Request) {
+	log.Println("works")
+}
+
 // AdminShowReservation displays in a detailed view a single reservation
 func (pr *Repository) AdminShowReservation(w http.ResponseWriter, r *http.Request) {
 	exploded := strings.Split(r.RequestURI, "/")
