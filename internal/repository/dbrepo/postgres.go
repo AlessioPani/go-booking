@@ -376,13 +376,13 @@ func (m *postgresDbRepo) UpdateReservation(r models.Reservation) error {
 }
 
 // DeleteReservation deletes a reservation by ID
-func (m *postgresDbRepo) DeleteReservation(r models.Reservation) error {
+func (m *postgresDbRepo) DeleteReservation(id int) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
 	query := `delete from reservations where id=$1`
 
-	_, err := m.DB.ExecContext(ctx, query, r.ID)
+	_, err := m.DB.ExecContext(ctx, query, id)
 	if err != nil {
 		return err
 	}

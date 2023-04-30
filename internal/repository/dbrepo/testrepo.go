@@ -145,7 +145,7 @@ func (m *testDbRepo) UpdateReservation(r models.Reservation) error {
 }
 
 // DeleteReservation deletes a reservation by ID
-func (m *testDbRepo) DeleteReservation(r models.Reservation) error {
+func (m *testDbRepo) DeleteReservation(id int) error {
 	return nil
 }
 

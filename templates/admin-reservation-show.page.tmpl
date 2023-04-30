@@ -59,6 +59,8 @@
             <a href="/admin/reservations-{{$src}}" class="btn btn-warning" value="Cancel">Cancel</a>
             <input type="submit" class="btn btn-primary" value="Save">
             <a href="#!" class="btn btn-info" onclick="processRes({{$res.ID}})" value="Mark as processed">Mark as processed</a>
+            <a href="#!" class="btn btn-danger" onclick="deleteRes({{$res.ID}})" value="Delete">Delete</a>
+            </div>
         </form>
     </div>
 {{end}}
@@ -76,6 +78,19 @@
                 }
             }
         })
+    }
+    
+    function deleteRes(id) {
+        attention.custom({
+            icon: "warning",
+            msg: "Are you sure?",
+            callback: function(result) {
+                if (result != false) {
+                    window.location.href = "/admin/delete-reservation/{{$src}}/" + id;
+                }
+            }
+        })
+
     }
 
 </script>
