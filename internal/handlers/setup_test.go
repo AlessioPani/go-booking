@@ -3,13 +3,6 @@ package handlers
 import (
 	"encoding/gob"
 	"fmt"
-	"github.com/AlessioPani/go-booking/internal/config"
-	"github.com/AlessioPani/go-booking/internal/models"
-	"github.com/AlessioPani/go-booking/internal/renders"
-	"github.com/alexedwards/scs/v2"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
-	"github.com/justinas/nosurf"
 	"html/template"
 	"log"
 	"net/http"
@@ -17,9 +10,22 @@ import (
 	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/AlessioPani/go-booking/internal/config"
+	"github.com/AlessioPani/go-booking/internal/models"
+	"github.com/AlessioPani/go-booking/internal/renders"
+	"github.com/alexedwards/scs/v2"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/justinas/nosurf"
 )
 
-var functions = template.FuncMap{}
+var functions = template.FuncMap{
+	"humanDate":  renders.HumanDate,
+	"formatDate": renders.FormatDate,
+	"iterate":    renders.Iterate,
+}
+
 var app config.AppConfig
 var session *scs.SessionManager
 var pathToTemplates = "./../../templates"
@@ -27,6 +33,10 @@ var pathToTemplates = "./../../templates"
 func TestMain(m *testing.M) {
 	// data models I'm going to put to the session
 	gob.Register(models.Reservation{})
+	gob.Register(models.User{})
+	gob.Register(models.Room{})
+	gob.Register(models.Restriction{})
+	gob.Register(map[string]int{})
 
 	// change this to true when in production
 	app.InProduction = false
