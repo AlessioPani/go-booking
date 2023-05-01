@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/AlessioPani/go-booking/internal/config"
@@ -14,6 +15,7 @@ import (
 	"github.com/AlessioPani/go-booking/internal/helpers"
 	"github.com/AlessioPani/go-booking/internal/models"
 	"github.com/AlessioPani/go-booking/internal/renders"
+	"github.com/joho/godotenv"
 
 	"github.com/alexedwards/scs/v2"
 )
@@ -60,6 +62,13 @@ func run() (*driver.DB, error) {
 	gob.Register(models.Restriction{})
 	gob.Register(map[string]int{})
 
+	var myEnv map[string]string
+	myEnv, err := godotenv.Read()
+	if err != nil {
+		log.Println(err)
+		log.Fatal("cannot read .env file")
+	}
+
 	// create a channel
 	mailChan := make(chan models.MailData)
 	app.MailChan = mailChan
@@ -69,7 +78,7 @@ func run() (*driver.DB, error) {
 	listenForMail()
 
 	// change this to true when in production
-	app.InProduction = false
+	app.InProduction, _ = strconv.ParseBool(myEnv["IN_PRODUCTION"])
 
 	// Set up the infoLog
 	infoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
@@ -92,7 +101,7 @@ func run() (*driver.DB, error) {
 		log.Fatal("cannot create template cache")
 	}
 	app.TemplateCache = tc
-	app.UseCache = false
+	app.UseCache, _ = strconv.ParseBool(myEnv["USE_CACHE"])
 	app.Session = session
 
 	// connect to database
