@@ -669,11 +669,11 @@ func (pr *Repository) AdminPostCalendarReservations(w http.ResponseWriter, r *ht
 	}
 
 	// Handle new blocks
-	for name, _ := range r.PostForm {
+	for name := range r.PostForm {
 		if strings.HasPrefix(name, "add_block") {
 			exploded := strings.Split(name, "_")
 			roomId, _ := strconv.Atoi(exploded[2])
-			date, err := time.Parse("2006-01-2", exploded[3])
+			date, _ := time.Parse("2006-01-2", exploded[3])
 
 			// insert a new block
 			err = pr.DB.AddBlockForRoom(roomId, date)

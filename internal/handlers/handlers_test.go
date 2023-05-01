@@ -13,11 +13,6 @@ import (
 	"github.com/AlessioPani/go-booking/internal/models"
 )
 
-type postData struct {
-	key   string
-	value string
-}
-
 var theTests = []struct {
 	name               string
 	url                string
@@ -600,7 +595,7 @@ func TestRepository_AvailabilityJSON(t *testing.T) {
 	handler := http.HandlerFunc(Repo.AvailabilityJSON)
 	handler.ServeHTTP(rr, req)
 
-	err := json.Unmarshal([]byte(rr.Body.String()), &jr)
+	err := json.Unmarshal([]byte(rr.Body.Bytes()), &jr)
 	if err != nil {
 		t.Error("failed to parse json")
 	}
@@ -625,7 +620,7 @@ func TestRepository_AvailabilityJSON(t *testing.T) {
 	handler = http.HandlerFunc(Repo.AvailabilityJSON)
 	handler.ServeHTTP(rr, req)
 
-	err = json.Unmarshal([]byte(rr.Body.String()), &jr)
+	err = json.Unmarshal([]byte(rr.Body.Bytes()), &jr)
 	if err != nil {
 		t.Error("failed to parse json")
 	}
@@ -645,7 +640,7 @@ func TestRepository_AvailabilityJSON(t *testing.T) {
 	handler = http.HandlerFunc(Repo.AvailabilityJSON)
 	handler.ServeHTTP(rr, req)
 
-	err = json.Unmarshal([]byte(rr.Body.String()), &jr)
+	err = json.Unmarshal([]byte(rr.Body.Bytes()), &jr)
 	if err != nil {
 		t.Error("failed to parse json")
 	}
