@@ -26,23 +26,15 @@ var theTests = []struct {
 	{"ms", "/majors-suite", "GET", http.StatusOK},
 	{"sa", "/search-availability", "GET", http.StatusOK},
 	{"contact", "/contact", "GET", http.StatusOK},
-	//{"mr", "/make-reservation", "GET", http.StatusOK},
-
-	// POST
-	//{"post-sa", "/search-availability", "POST", []postData{
-	//	{key: "start", value: "2020-11-11"},
-	//	{key: "end", value: "2020-11-20"},
-	//}, http.StatusOK},
-	//{"post-sa-json", "/search-availability-json", "POST", []postData{
-	//	{key: "start", value: "2020-11-11"},
-	//	{key: "end", value: "2020-11-20"},
-	//}, http.StatusOK},
-	//{"mr", "/make-reservation", "POST", []postData{
-	//	{key: "first_name", value: "John"},
-	//	{key: "last_name", value: "Wick"},
-	//	{key: "email", value: "me@me.com"},
-	//	{key: "phone", value: "695806580"},
-	//}, http.StatusOK},
+	{"non-existent", "/invalid", "GET", http.StatusNotFound},
+	{"login", "/user/login", "GET", http.StatusOK},
+	{"logout", "/user/logout", "GET", http.StatusOK},
+	{"dashboard", "/admin/dashboard", "GET", http.StatusOK},
+	{"new res", "/admin/reservations-new", "GET", http.StatusOK},
+	{"all res", "/admin/reservations-all", "GET", http.StatusOK},
+	{"show res", "/admin/reservations/new/1", "GET", http.StatusOK},
+	{"show res cal", "/admin/reservations-cal", "GET", http.StatusOK},
+	{"show res cal with params", "/admin/reservations-cal?y=2023&m=4", "GET", http.StatusOK},
 }
 
 func TestHandlers(t *testing.T) {

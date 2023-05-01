@@ -7,7 +7,9 @@ This repository contains a web application for a Booking and Reservation system.
   - [Alex Edwards's SCS session management system](https://github.com/alexedwards/scs/v2)
   - [NoSurf](https://github.com/justinas/nosurf) as a middleware
   - [Soda/Pop](https://gobuffalo.io/documentation/database/pop/) for database migrations
-  - [Alex Saskevich's](github.com/asaskevich/govalidator) validator
+  - [Alex Saskevich's](https://github.com/asaskevich/govalidator) validator
+  - [Pgx](https://github.com/jackc/pgx) as driver for the PostgreSQL database
+  - [Godotenv](https://github.com/joho/godotenv) to load a .env file with potentially must-remain-secret data
   
 - To run
 

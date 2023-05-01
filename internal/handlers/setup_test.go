@@ -101,8 +101,25 @@ func getRoutes() http.Handler {
 	mux.Post("/make-reservation", Repo.PostReservation)
 	mux.Get("/reservation-summary", Repo.ReservationSummary)
 
+	mux.Get("/user/login", Repo.ShowLogin)
+	mux.Post("/user/login", Repo.PostShowLogin)
+	mux.Get("/user/logout", Repo.Logout)
+
 	fileServer := http.FileServer(http.Dir("./static/"))
 	mux.Handle("/static/*", http.StripPrefix("/static", fileServer))
+
+	mux.Route("/admin", func(mux chi.Router) {
+		mux.Get("/dashboard", Repo.AdminDashboard)
+		mux.Get("/reservations-new", Repo.AdminNewReservations)
+		mux.Get("/reservations-all", Repo.AdminAllReservations)
+		mux.Get("/reservations-cal", Repo.AdminCalendarReservations)
+		mux.Post("/reservations-cal", Repo.AdminPostCalendarReservations)
+		mux.Get("/process-reservation/{src}/{id}", Repo.AdminProcessReservation)
+		mux.Get("/delete-reservation/{src}/{id}", Repo.AdminDeleteReservation)
+		mux.Get("/reservations/{src}/{id}", Repo.AdminShowReservation)
+		mux.Post("/reservations/{src}/{id}", Repo.AdminPostShowReservation)
+
+	})
 
 	return mux
 }
