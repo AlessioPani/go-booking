@@ -115,6 +115,10 @@ func (m *testDbRepo) UpdateUserById(u models.User) error {
 }
 
 func (m *testDbRepo) Authenticate(email, testPassword string) (int, string, error) {
+	if email == "invalid@invalid.com" {
+		return 0, "", errors.New("invalid email")
+	}
+
 	return 1, "", nil
 }
 
