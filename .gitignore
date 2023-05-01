@@ -19,3 +19,7 @@ database.yml
 /.idea/inspectionProfiles/Project_Default.xml
 /bookings
 /.idea/sqldialects.xml
+/.idea/.gitignore
+/.idea/go-booking.iml
+/.idea/modules.xml
+/.idea/vcs.xml
