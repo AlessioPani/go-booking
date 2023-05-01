@@ -124,6 +124,14 @@ func TestRepository_Reservation(t *testing.T) {
 }
 
 func TestRepository_PostReservation(t *testing.T) {
+	reservation := models.Reservation{
+		RoomId: 1,
+		Room: models.Room{
+			ID:       1,
+			RoomName: "Test Room",
+		},
+	}
+
 	postedData := url.Values{}
 	postedData.Add("start_date", "2050-01-01")
 	postedData.Add("end_date", "2050-01-02")
@@ -136,6 +144,7 @@ func TestRepository_PostReservation(t *testing.T) {
 	req, _ := http.NewRequest("POST", "/make-reservation", strings.NewReader(postedData.Encode()))
 	ctx := getCtx(req)
 	req = req.WithContext(ctx)
+	session.Put(ctx, "reservation", reservation)
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
@@ -248,6 +257,7 @@ func TestRepository_PostReservation(t *testing.T) {
 
 	req, _ = http.NewRequest("POST", "/make-reservation", strings.NewReader(postedData.Encode()))
 	ctx = getCtx(req)
+	session.Put(ctx, "reservation", reservation)
 	req = req.WithContext(ctx)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	rr = httptest.NewRecorder()
@@ -256,8 +266,8 @@ func TestRepository_PostReservation(t *testing.T) {
 
 	handler.ServeHTTP(rr, req)
 
-	if rr.Code != http.StatusSeeOther {
-		t.Errorf("PostReservation handler returned wrong response code for invalid data: got %d, wanted %d", rr.Code, http.StatusSeeOther)
+	if rr.Code != http.StatusOK {
+		t.Errorf("PostReservation handler returned wrong response code for invalid data: got %d, wanted %d", rr.Code, http.StatusOK)
 	}
 
 	// test for failure to insert reservation into database
@@ -272,6 +282,7 @@ func TestRepository_PostReservation(t *testing.T) {
 
 	req, _ = http.NewRequest("POST", "/make-reservation", strings.NewReader(postedData.Encode()))
 	ctx = getCtx(req)
+	session.Put(ctx, "reservation", reservation)
 	req = req.WithContext(ctx)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	rr = httptest.NewRecorder()
@@ -293,6 +304,31 @@ func TestRepository_PostReservation(t *testing.T) {
 	postedData.Add("email", "john@smith.com")
 	postedData.Add("phone", "123456789")
 	postedData.Add("room_id", "1000")
+
+	req, _ = http.NewRequest("POST", "/make-reservation", strings.NewReader(postedData.Encode()))
+	ctx = getCtx(req)
+	session.Put(ctx, "reservation", reservation)
+	req = req.WithContext(ctx)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	rr = httptest.NewRecorder()
+
+	handler = http.HandlerFunc(Repo.PostReservation)
+
+	handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("PostReservation handler failed when trying to fail inserting reservation: got %d, wanted %d", rr.Code, http.StatusSeeOther)
+	}
+
+	// test for failure to get reservation from session
+	postedData = url.Values{}
+	postedData.Add("start_date", "2050-01-01")
+	postedData.Add("end_date", "2050-01-02")
+	postedData.Add("first_name", "John")
+	postedData.Add("last_name", "Smith")
+	postedData.Add("email", "john@smith.com")
+	postedData.Add("phone", "123456789")
+	postedData.Add("room_id", "1")
 
 	req, _ = http.NewRequest("POST", "/make-reservation", strings.NewReader(postedData.Encode()))
 	ctx = getCtx(req)
