@@ -2,11 +2,11 @@ package main
 
 import (
 	"encoding/gob"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/AlessioPani/go-booking/internal/config"
@@ -15,7 +15,6 @@ import (
 	"github.com/AlessioPani/go-booking/internal/helpers"
 	"github.com/AlessioPani/go-booking/internal/models"
 	"github.com/AlessioPani/go-booking/internal/renders"
-	"github.com/joho/godotenv"
 
 	"github.com/alexedwards/scs/v2"
 )
@@ -62,12 +61,15 @@ func run() (*driver.DB, error) {
 	gob.Register(models.Restriction{})
 	gob.Register(map[string]int{})
 
-	var myEnv map[string]string
-	myEnv, err := godotenv.Read()
-	if err != nil {
-		log.Println(err)
-		log.Fatal("cannot read .env file")
-	}
+	// parse flags provided by cli
+	production := flag.Bool("production", true, "True for production, false for development")
+	useCache := flag.Bool("cache", true, "Use template cache")
+	dbHost := flag.String("dbhost", "localhost", "Database hostname")
+	dbPort := flag.String("dbport", "5432", "Database port")
+	dbName := flag.String("dbname", "bookings", "Database name")
+	dbUser := flag.String("dbuser", "postgres", "Database username")
+	dbPassword := flag.String("dbpassword", "", "Database password")
+	flag.Parse()
 
 	// create a channel
 	mailChan := make(chan models.MailData)
@@ -78,7 +80,7 @@ func run() (*driver.DB, error) {
 	listenForMail()
 
 	// change this to true when in production
-	app.InProduction, _ = strconv.ParseBool(myEnv["IN_PRODUCTION"])
+	app.InProduction = *production
 
 	// Set up the infoLog
 	infoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
@@ -101,12 +103,12 @@ func run() (*driver.DB, error) {
 		log.Fatal("cannot create template cache")
 	}
 	app.TemplateCache = tc
-	app.UseCache, _ = strconv.ParseBool(myEnv["USE_CACHE"])
+	app.UseCache = *useCache
 	app.Session = session
 
 	// connect to database
 	log.Println("Connecting to database...")
-	db, err := driver.ConnectSQL("host=localhost port=5432 dbname=bookings user=postgres password=postgres")
+	db, err := driver.ConnectSQL(fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s", *dbHost, *dbPort, *dbName, *dbUser, *dbPassword))
 	if err != nil {
 		log.Fatal("cannot connect to database")
 	}
