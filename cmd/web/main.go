@@ -45,7 +45,7 @@ func main() {
 
 	serve := &http.Server{
 		Addr:    portNumber,
-		Handler: routes(&app),
+		Handler: routes(),
 	}
 
 	fmt.Println("Starting an application on port", portNumber[1:])

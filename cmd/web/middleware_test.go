@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"testing"
 )
@@ -14,7 +13,7 @@ func TestNoSurf(t *testing.T) {
 	case http.Handler:
 	// do nothing
 	default:
-		t.Error(fmt.Sprintf("Type is not an http.Handler %T", v))
+		t.Errorf("Type is not an http.Handler %T", v)
 	}
 }
 
@@ -26,7 +25,7 @@ func TestSessionLoad(t *testing.T) {
 	case http.Handler:
 	// do nothing
 	default:
-		t.Error(fmt.Sprintf("Type is not an http.Handler %T", v))
+		t.Errorf("Type is not an http.Handler %T", v)
 	}
 
 }
